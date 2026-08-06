@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hack the System | Numberdle</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Matrix Background -->
+    <canvas id="matrix"></canvas>
+
+    <!-- CRT Scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- Main Container -->
+    <div class="game-container">
+
+        <!-- Header -->
+        <header class="game-header">
+
+            <h1 class="glitch" data-text="NUMBERDLE">
+                NUMBERDLE
+            </h1>
+
+            <p class="subtitle">
+                Crack the 5-digit security key
+            </p>
+
+        </header>
+
+        <!-- Status Panel -->
+        <section class="status-panel">
+
+            <div class="status-card">
+                <span>Attempts Left</span>
+                <strong id="attempts">6</strong>
+            </div>
+
+            <div class="status-card">
+                <span>Digits</span>
+                <strong>5</strong>
+            </div>
+
+            <div class="status-card">
+                <span>Status</span>
+                <strong id="statusText">
+                    Awaiting Input...
+                </strong>
+            </div>
+
+        </section>
+
+        <!-- Game Board -->
+        <section class="board-wrapper">
+
+            <div id="board" class="board">
+
+                <!-- Row 1 -->
+                <div class="row">
+                    <div class="tile" data-row="0" data-col="0"></div>
+                    <div class="tile" data-row="0" data-col="1"></div>
+                    <div class="tile" data-row="0" data-col="2"></div>
+                    <div class="tile" data-row="0" data-col="3"></div>
+                    <div class="tile" data-row="0" data-col="4"></div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="row">
+                    <div class="tile" data-row="1" data-col="0"></div>
+                    <div class="tile" data-row="1" data-col="1"></div>
+                    <div class="tile" data-row="1" data-col="2"></div>
+                    <div class="tile" data-row="1" data-col="3"></div>
+                    <div class="tile" data-row="1" data-col="4"></div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="row">
+                    <div class="tile" data-row="2" data-col="0"></div>
+                    <div class="tile" data-row="2" data-col="1"></div>
+                    <div class="tile" data-row="2" data-col="2"></div>
+                    <div class="tile" data-row="2" data-col="3"></div>
+                    <div class="tile" data-row="2" data-col="4"></div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="row">
+                    <div class="tile" data-row="3" data-col="0"></div>
+                    <div class="tile" data-row="3" data-col="1"></div>
+                    <div class="tile" data-row="3" data-col="2"></div>
+                    <div class="tile" data-row="3" data-col="3"></div>
+                    <div class="tile" data-row="3" data-col="4"></div>
+                </div>
+
+                <!-- Row 5 -->
+                <div class="row">
+                    <div class="tile" data-row="4" data-col="0"></div>
+                    <div class="tile" data-row="4" data-col="1"></div>
+                    <div class="tile" data-row="4" data-col="2"></div>
+                    <div class="tile" data-row="4" data-col="3"></div>
+                    <div class="tile" data-row="4" data-col="4"></div>
+                </div>
+
+                <!-- Row 6 -->
+                <div class="row">
+                    <div class="tile" data-row="5" data-col="0"></div>
+                    <div class="tile" data-row="5" data-col="1"></div>
+                    <div class="tile" data-row="5" data-col="2"></div>
+                    <div class="tile" data-row="5" data-col="3"></div>
+                    <div class="tile" data-row="5" data-col="4"></div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Message Area -->
+        <section class="message-panel">
+
+            <p id="message">
+                Enter a 5-digit number to begin hacking...
+            </p>
+
+        </section>
+
+        <!-- Keyboard starts here in Part 2A-2 -->        <!-- ==========================
+             On-Screen Keyboard
+        =========================== -->
+
+        <section class="keyboard-wrapper">
+
+            <!-- Row 1 -->
+            <div class="keyboard-row">
+
+                <button class="key" data-key="1">1</button>
+                <button class="key" data-key="2">2</button>
+                <button class="key" data-key="3">3</button>
+                <button class="key" data-key="4">4</button>
+                <button class="key" data-key="5">5</button>
+
+            </div>
+
+            <!-- Row 2 -->
+            <div class="keyboard-row">
+
+                <button class="key" data-key="6">6</button>
+                <button class="key" data-key="7">7</button>
+                <button class="key" data-key="8">8</button>
+                <button class="key" data-key="9">9</button>
+                <button class="key" data-key="0">0</button>
+
+            </div>
+
+            <!-- Controls -->
+            <div class="keyboard-row">
+
+                <button
+                    class="key action"
+                    id="backspaceBtn"
+                    data-key="Backspace">
+
+                    ⌫ Backspace
+
+                </button>
+
+                <button
+                    class="key enter"
+                    id="enterBtn"
+                    data-key="Enter">
+
+                    ENTER
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- ==========================
+         Win Overlay
+    =========================== -->
+
+    <div id="winOverlay" class="overlay hidden">
+
+        <div class="overlay-card">
+
+            <h2>ACCESS GRANTED</h2>
+
+            <p>
+                Security layer bypassed successfully.
+            </p>
+
+            <div class="loader"></div>
+
+            <p class="small">
+                Generating Security Token...
+            </p>
+
+            <div id="generatedCode" class="access-code">
+                ------
+            </div>
+
+            <button id="continueBtn">
+                Continue
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================
+         Lose Overlay
+    =========================== -->
+
+    <div id="loseOverlay" class="overlay hidden">
+
+        <div class="overlay-card">
+
+            <h2>ACCESS DENIED</h2>
+
+            <p>
+                Firewall intrusion detected.
+            </p>
+
+            <p>
+                Your hacking attempt has failed.
+            </p>
+
+            <button id="restartBtn">
+                Try Again
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ==========================
+         Floating Hacker Messages
+    =========================== -->
+
+    <div id="hackFeed">
+
+        <p>Connecting...</p>
+
+    </div>
+
+    <!-- ==========================
+         Audio (Optional)
+    =========================== -->
+
+    <audio id="keypressSound" preload="auto"></audio>
+
+    <audio id="successSound" preload="auto"></audio>
+
+    <audio id="errorSound" preload="auto"></audio>
+
+    <!-- ==========================
+         JavaScript
+    =========================== -->
+
+    <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Security Verification</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <!-- Matrix Background -->
+    <canvas id="matrix"></canvas>
+
+    <!-- CRT Scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- Main Container -->
+
+    <div class="verify-container">
+
+        <div class="verify-card">
+
+            <h1 class="glitch"
+                data-text="SECURITY VERIFICATION">
+
+                SECURITY VERIFICATION
+
+            </h1>
+
+            <p class="verify-subtitle">
+
+                Enter the security token obtained after
+                successfully hacking the Numberdle system.
+
+            </p>
+
+            <div class="verify-box">
+
+                <label for="codeInput">
+
+                    ACCESS CODE
+
+                </label>
+
+                <input
+                    type="text"
+                    id="codeInput"
+                    maxlength="6"
+                    autocomplete="off"
+                    placeholder="XXXXXX">
+
+                <button id="verifyBtn">
+
+                    VERIFY ACCESS
+
+                </button>
+
+            </div>
+
+            <p id="verifyMessage">
+
+                Awaiting verification...
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Loading Overlay -->
+
+    <div id="loadingOverlay"
+         class="overlay hidden">
+
+        <div class="overlay-card">
+
+            <h2>
+
+                ACCESS ACCEPTED
+
+            </h2>
+
+            <div class="loader"></div>
+
+            <p id="loadingText">
+
+                Decrypting...
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Error Overlay -->
+
+    <div id="errorOverlay"
+         class="overlay hidden">
+
+        <div class="overlay-card">
+
+            <h2
+                style="color:#ff3b3b">
+
+                ACCESS DENIED
+
+            </h2>
+
+            <p>
+
+                Invalid security token.
+
+            </p>
+
+            <button id="tryAgainBtn">
+
+                TRY AGAIN
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

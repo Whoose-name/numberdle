@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mission Complete</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <!-- Matrix Background -->
+    <canvas id="matrix"></canvas>
+
+    <!-- CRT Scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- Floating Confetti -->
+    <div id="confettiContainer"></div>
+
+    <!-- Main Success Screen -->
+
+    <main class="success-container">
+
+        <section class="success-card">
+
+            <h1
+                class="glitch"
+                data-text="SYSTEM HACKED">
+
+                SYSTEM HACKED
+
+            </h1>
+
+            <p class="success-subtitle">
+
+                Intrusion Successful
+
+            </p>
+
+            <!-- Fake Terminal -->
+
+            <div class="terminal-window">
+
+                <div id="terminalOutput">
+
+                    <!-- Filled by JavaScript -->
+
+                </div>
+
+            </div>
+
+            <!-- Final Result -->
+
+            <div
+                id="successPanel"
+                class="success-panel hidden">
+
+<pre>
+
+██████████████████████████████
+
+SYSTEM SUCCESSFULLY HACKED
+
+MISSION COMPLETE
+
+Congratulations Agent.
+
+██████████████████████████████
+
+</pre>
+
+            </div>
+
+            <!-- Restart -->
+
+            <button
+                id="restartMission">
+
+                START NEW MISSION
+
+            </button>
+
+        </section>
+
+    </main>
+
+    <!-- Celebration Overlay -->
+
+    <div
+        id="celebrationOverlay"
+        class="overlay hidden">
+
+        <div class="overlay-card">
+
+            <h2>
+
+                ACCESS COMPLETE
+
+            </h2>
+
+            <p>
+
+                Root privileges obtained.
+
+            </p>
+
+            <p>
+
+                Mission accomplished.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Shared JavaScript -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
