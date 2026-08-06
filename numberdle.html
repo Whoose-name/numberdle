@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hack the System | Numberdle</title>
+    <title>Hack the System | Security Authentication Terminal</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -22,12 +22,12 @@
         <!-- Header -->
         <header class="game-header">
 
-            <h1 class="glitch" data-text="NUMBERDLE">
-                NUMBERDLE
+            <h1 class="glitch" data-text="SECURITY AUTHENTICATION TERMINAL">
+                SECURITY AUTHENTICATION TERMINAL
             </h1>
 
             <p class="subtitle">
-                Crack the 5-digit security key
+                Reconstruct the encrypted five-digit authentication sequence.
             </p>
 
         </header>
@@ -36,20 +36,25 @@
         <section class="status-panel">
 
             <div class="status-card">
-                <span>Attempts Left</span>
+                <span>Firewall Lockout Countdown</span>
                 <strong id="attempts">6</strong>
             </div>
 
             <div class="status-card">
-                <span>Digits</span>
-                <strong>5</strong>
+                <span>Security Protocol</span>
+                <strong>5 Unique Digits</strong>
             </div>
 
             <div class="status-card">
-                <span>Status</span>
+                <span>Network Status</span>
                 <strong id="statusText">
-                    Awaiting Input...
+                    Authentication Idle
                 </strong>
+            </div>
+
+            <div class="status-card">
+                <span>Authentication Attempt</span>
+                <strong id="attemptBuffer">-----</strong>
             </div>
 
         </section>
@@ -119,9 +124,10 @@
 
         <!-- Message Area -->
         <section class="message-panel">
+            <span class="log-label">System Log</span>
 
             <p id="message">
-                Enter a 5-digit number to begin hacking...
+                Awaiting authentication attempt...
             </p>
 
         </section>
@@ -162,7 +168,7 @@
                     id="backspaceBtn"
                     data-key="Backspace">
 
-                    ⌫ Backspace
+                    ⌫ DELETE
 
                 </button>
 
@@ -171,7 +177,7 @@
                     id="enterBtn"
                     data-key="Enter">
 
-                    ENTER
+                    AUTHENTICATE
 
                 </button>
 
@@ -189,24 +195,28 @@
 
         <div class="overlay-card">
 
-            <h2>ACCESS GRANTED</h2>
+            <h2>ACCESS TOKEN GENERATED</h2>
 
             <p>
-                Security layer bypassed successfully.
+                AUTHENTICATION SEQUENCE ACCEPTED
             </p>
 
             <div class="loader"></div>
 
             <p class="small">
-                Generating Security Token...
+                Temporary security token generated successfully.
             </p>
 
             <div id="generatedCode" class="access-code">
                 ------
             </div>
 
+            <p class="small">
+                This token grants temporary access to the next security layer.
+            </p>
+
             <button id="continueBtn">
-                Continue
+                CONTINUE TO TOKEN VERIFICATION
             </button>
 
         </div>
@@ -221,18 +231,18 @@
 
         <div class="overlay-card">
 
-            <h2>ACCESS DENIED</h2>
+            <h2>FIREWALL LOCKDOWN INITIATED</h2>
 
             <p>
-                Firewall intrusion detected.
+                Intrusion Detected. Access Denied.
             </p>
 
             <p>
-                Your hacking attempt has failed.
+                Mission Failed. Session permanently blocked.
             </p>
 
             <button id="restartBtn">
-                Try Again
+                REINITIALIZE SESSION
             </button>
 
         </div>
@@ -245,7 +255,7 @@
 
     <div id="hackFeed">
 
-        <p>Connecting...</p>
+        <p>Establishing encrypted tunnel...</p>
 
     </div>
 

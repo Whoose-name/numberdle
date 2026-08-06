@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Security Verification</title>
+    <title>Security Token Verification</title>
 
     <link rel="stylesheet" href="style.css">
 
@@ -29,16 +29,15 @@
         <div class="verify-card">
 
             <h1 class="glitch"
-                data-text="SECURITY VERIFICATION">
+                data-text="SECURITY TOKEN VERIFICATION">
 
-                SECURITY VERIFICATION
+                SECURITY TOKEN VERIFICATION
 
             </h1>
 
             <p class="verify-subtitle">
 
-                Enter the security token obtained after
-                successfully hacking the Numberdle system.
+                Enter Temporary Access Token
 
             </p>
 
@@ -46,7 +45,7 @@
 
                 <label for="codeInput">
 
-                    ACCESS CODE
+                    TEMPORARY ACCESS TOKEN
 
                 </label>
 
@@ -59,7 +58,7 @@
 
                 <button id="verifyBtn">
 
-                    VERIFY ACCESS
+                    VERIFY TOKEN
 
                 </button>
 
@@ -67,7 +66,7 @@
 
             <p id="verifyMessage">
 
-                Awaiting verification...
+                Awaiting cryptographic verification...
 
             </p>
 
@@ -84,7 +83,7 @@
 
             <h2>
 
-                ACCESS ACCEPTED
+                TOKEN VERIFIED
 
             </h2>
 
@@ -92,7 +91,7 @@
 
             <p id="loadingText">
 
-                Decrypting...
+                Launching decryption protocol...
 
             </p>
 
@@ -110,19 +109,19 @@
             <h2
                 style="color:#ff3b3b">
 
-                ACCESS DENIED
+                TOKEN REJECTED
 
             </h2>
 
             <p>
 
-                Invalid security token.
+                Security mismatch detected.
 
             </p>
 
             <button id="tryAgainBtn">
 
-                TRY AGAIN
+                RETRY VERIFICATION
 
             </button>
 

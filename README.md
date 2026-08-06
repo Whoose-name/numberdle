@@ -1,18 +1,20 @@
-# Hack the System - Numberdle
+# Hack the System - Security Terminal Simulation
 
-A futuristic cyberpunk-themed Numberdle game built using HTML, CSS, and JavaScript.
+A futuristic cyberpunk-themed web experience built with HTML, CSS, and JavaScript that simulates a fictional classified cybersecurity infiltration terminal.
 
 ## Features
 
-- 5-digit Numberdle puzzle
-- Wordle-style color feedback
+- Security authentication terminal with five-unique-digit cryptographic verification
+- Terminal-style authentication feedback (green/yellow/red status mapping)
 - Hacker-themed UI
 - Matrix rain animation
 - Terminal typing effects
-- Random access code generation
-- Verification page
-- Mission complete success screen
+- Random temporary access token generation
+- Security token verification page
+- Cinematic secure session completion sequence
 - Responsive design
+
+> This interface is fictional and intended for entertainment and learning.
 
 ## Technologies
 

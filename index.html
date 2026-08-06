@@ -1,178 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Hack The System</title>
-
-<link rel="stylesheet" href="style.css">
-<script src="script.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hack the System | Classified Console</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+<body class="landing-page">
+    <canvas id="matrix"></canvas>
+    <div class="scanlines"></div>
 
-<body>
+    <main id="bootScreen" class="boot-screen">
+        <section class="terminal boot-terminal" aria-label="Boot Sequence">
+            <p>&gt; INITIALIZING CLASSIFIED SECURITY CONSOLE...</p>
+            <p>&gt; RUNNING HARDWARE DIAGNOSTICS... [OK]</p>
+            <p>&gt; ENCRYPTED NETWORK INITIALIZATION... [OK]</p>
+            <p>&gt; FIREWALL STATUS... ACTIVE</p>
+            <p>&gt; AUTHENTICATION SERVICE STARTUP... [OK]</p>
+            <p>&gt; INTRUSION ALERT FLAGGED... ESCALATING</p>
+        </section>
+    </main>
 
-<canvas id="matrix"></canvas>
+    <main id="mainScreen" class="landing-main hidden">
+        <h1 class="glitch" data-text="HACK THE SYSTEM">HACK THE SYSTEM</h1>
 
-<div class="scanlines"></div>
+        <section class="card briefing-card">
+            <div id="terminalText" class="terminal-text"></div>
 
-<div id="bootScreen">
+            <pre class="briefing-copy">
+SECURITY INCIDENT DETECTED
 
-    <div class="terminal">
+An encrypted authentication token has been isolated within the target security system.
 
-        <p>> Booting Security Console...</p>
-        <p>> Initializing Network...</p>
-        <p>> Connecting...</p>
-        <p>> Accessing Firewall...</p>
-        <p>> WARNING...</p>
+Standard authentication has been disabled.
 
-    </div>
+To retrieve the temporary access token, you must successfully complete the cryptographic verification sequence.
 
-</div>
+NOTICE:
+■ Green  = Correct digit in the correct position.
+■ Yellow = Correct digit but incorrect position.
+■ Red    = Digit is not present.
 
+Maximum attempts before the firewall permanently locks the session: 6
 
-<div id="mainScreen" class="hidden">
+Proceed only if authorized.
+            </pre>
 
-    <h1 class="glitch" data-text="HACK THE SYSTEM">
-        HACK THE SYSTEM
-    </h1>
+            <p class="fiction-note">
+                Fictional interface for entertainment and learning.
+            </p>
 
-    <div class="card">
+            <button id="startBtn" type="button">INITIATE INFILTRATION</button>
+        </section>
+    </main>
 
-        <div id="terminalText"></div>
-
-        <button id="startBtn">
-            START HACK
-        </button>
-
-    </div>
-
-</div>
-
-<script>
-
-const terminalmessage=[
-"SYSTEM BREACH DETECTED",
-"",
-"Hack the system to retrieve the access code.",
-"",
-"Your only way in is to solve the Numberdle.",
-"",
-"Good Luck..."
-];
-
-setTimeout(()=>{
-
-document.getElementById("bootScreen").style.display="none";
-
-document.getElementById("mainScreen").classList.remove("hidden");
-
-typeMessage();
-
-},4500);
-
-
-function typeMessage(){
-
-const box=document.getElementById("terminalText");
-
-let line=0;
-
-function typeLine(){
-
-if(line>=terminalmessage.length) return;
-
-let i=0;
-
-const p=document.createElement("p");
-
-box.appendChild(p);
-
-const txt=terminalmessage[line];
-
-const timer=setInterval(()=>{
-
-p.textContent=txt.substring(0,i);
-
-i++;
-
-if(i>txt.length){
-
-clearInterval(timer);
-
-line++;
-
-setTimeout(typeLine,300);
-
-}
-
-},35);
-
-}
-
-typeLine();
-
-}
-
-document.getElementById("startBtn").onclick = () => {
-    window.location.href = "numberdle.html";
-};
-</script>
-
-<script>
-
-const canvas=document.getElementById("matrix");
-
-const ctx=canvas.getContext("2d");
-
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%^&*@";
-
-const fontSize=18;
-
-const columns=canvas.width/fontSize;
-
-const drops=[];
-
-for(let i=0;i<columns;i++)
-drops[i]=1;
-
-function draw(){
-
-ctx.fillStyle="rgba(0,0,0,0.06)";
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
-ctx.fillStyle="#00ff66";
-ctx.font=fontSize+"px monospace";
-
-for(let i=0;i<drops.length;i++){
-
-const text=letters[Math.floor(Math.random()*letters.length)];
-
-ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-
-if(drops[i]*fontSize>canvas.height&&Math.random()>0.975)
-drops[i]=0;
-
-drops[i]++;
-
-}
-
-}
-
-setInterval(draw,40);
-
-window.onresize=()=>{
-
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-
-}
-
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>

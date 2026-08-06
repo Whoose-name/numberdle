@@ -1,875 +1,577 @@
-/* ==========================================
-   HACK THE SYSTEM
-   NUMBERDLE GAME ENGINE
-   Part 2B-1A
-========================================== */
-
-// =============================
-// GAME CONFIGURATION
-// =============================
-if (document.getElementById("board")) {
-
-    // All Numberdle code goes here
-
-
-const ROWS = 6;
-const COLS = 5;
-const MAX_ATTEMPTS = 6;
-
-let secretNumber = "";
-let currentGuess = "";
-let currentRow = 0;
-let gameOver = false;
-
-// =============================
-// DOM ELEMENTS
-// =============================
-
-const board = document.getElementById("board");
-const message = document.getElementById("message");
-const attemptsLabel = document.getElementById("attempts");
-const statusLabel = document.getElementById("statusText");
-
-const keyboardButtons = document.querySelectorAll(".key");
-
-// =============================
-// INITIALIZE GAME
-// =============================
-
-window.addEventListener("load", () => {
-
-    generateSecretNumber();
-
-    updateAttempts();
-
-    statusLabel.textContent = "Awaiting Input...";
-
-    console.log("Secret:", secretNumber); // remove later
-
-    setupKeyboard();
-
-    startHackFeed();
-
-});
-
-// =============================
-// RANDOM SECRET NUMBER
-// =============================
-
-function generateSecretNumber() {
-
-    secretNumber = "";
-
-    for (let i = 0; i < COLS; i++) {
-
-        secretNumber += Math.floor(Math.random() * 10);
-
-    }
-
-}
-
-// =============================
-// UPDATE ATTEMPTS
-// =============================
-
-function updateAttempts() {
-
-    attemptsLabel.textContent = MAX_ATTEMPTS - currentRow;
-
-}
-
-// =============================
-// GET TILE
-// =============================
-
-function getTile(row, col) {
-
-    return document.querySelector(
-        `.tile[data-row="${row}"][data-col="${col}"]`
-    );
-
-}
-
-// =============================
-// DRAW CURRENT GUESS
-// =============================
-
-function drawGuess() {
-
-    for (let col = 0; col < COLS; col++) {
-
-        const tile = getTile(currentRow, col);
-
-        tile.textContent = currentGuess[col] || "";
-
-    }
-
-}
-
-// =============================
-// CLEAR CURRENT ROW
-// =============================
-
-function clearRow() {
-
-    for (let col = 0; col < COLS; col++) {
-
-        const tile = getTile(currentRow, col);
-
-        tile.textContent = "";
-
-        tile.classList.remove(
-            "correct",
-            "present",
-            "absent",
-            "flip",
-            "shake"
-        );
-
-    }
-
-}
-
-// =============================
-// HACKER STATUS MESSAGES
-// =============================
-
-const hackMessages = [
-
-    "Scanning ports...",
-    "Bypassing firewall...",
-    "Decrypting packets...",
-    "Searching database...",
-    "Injecting payload...",
-    "Spoofing identity...",
-    "Reading memory...",
-    "Escalating privileges...",
-    "Analyzing network...",
-    "Compiling exploit..."
-
-];
-
-function randomHackMessage() {
-
-    const index = Math.floor(Math.random() * hackMessages.length);
-
-    message.textContent = hackMessages[index];
-
-}
-
-// =============================
-// AUTO STATUS FEED
-// =============================
-
-let hackFeedTimer = null;
-
-function startHackFeed() {
-
-    randomHackMessage();
-
-    hackFeedTimer = setInterval(() => {
-
-        if (!gameOver) {
-
-            randomHackMessage();
-
-        }
-
-    }, 3000);
-
-}
-
-// =============================
-// SHAKE ROW
-// =============================
-
-function shakeCurrentRow() {
-
-    for (let col = 0; col < COLS; col++) {
-
-        const tile = getTile(currentRow, col);
-
-        tile.classList.add("shake");
-
-        setTimeout(() => {
-
-            tile.classList.remove("shake");
-
-        }, 500);
-
-    }
-
-}/* ==========================================
-   Part 2B-2
-   Input + Evaluation + Win/Lose
-========================================== */
-
-// -------------------------------
-// Keyboard Setup
-// -------------------------------
-
-function setupKeyboard() {
-
-    document.addEventListener("keydown", handlePhysicalKey);
-
-    keyboardButtons.forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            handleInput(button.dataset.key);
-
-        });
-
-    });
-
-}
-
-// -------------------------------
-// Physical Keyboard
-// -------------------------------
-
-function handlePhysicalKey(e) {
-
-    if (gameOver) return;
-
-    if (/^[0-9]$/.test(e.key)) {
-
-        handleInput(e.key);
-
-    }
-    else if (e.key === "Backspace") {
-
-        handleInput("Backspace");
-
-    }
-    else if (e.key === "Enter") {
-
-        handleInput("Enter");
-
-    }
-
-}
-
-// -------------------------------
-// Main Input Handler
-// -------------------------------
-
-function handleInput(key) {
-
-    if (gameOver) return;
-
-    if (/^[0-9]$/.test(key)) {
-
-        if (currentGuess.length < COLS) {
-
-            currentGuess += key;
-
-            drawGuess();
-
-        }
-
-        return;
-
-    }
-
-    if (key === "Backspace") {
-
-        currentGuess = currentGuess.slice(0, -1);
-
-        drawGuess();
-
-        return;
-
-    }
-
-    if (key === "Enter") {
-
-        submitGuess();
-
-    }
-
-}
-
-// -------------------------------
-// Submit Guess
-// -------------------------------
-
-function submitGuess() {
-
-    if (currentGuess.length !== COLS) {
-
-        message.textContent = "Guess must contain 5 digits.";
-
-        shakeCurrentRow();
-
-        return;
-
-    }
-
-    evaluateGuess();
-
-}
-
-// -------------------------------
-// Evaluate Guess
-// -------------------------------
-
-function evaluateGuess() {
-
-    const answer = secretNumber.split("");
-    const guess = currentGuess.split("");
-
-    const state = new Array(COLS).fill("absent");
-
-    // PASS 1 - Correct position
-
-    for (let i = 0; i < COLS; i++) {
-
-        if (guess[i] === answer[i]) {
-
-            state[i] = "correct";
-
-            answer[i] = null;
-            guess[i] = null;
-
-        }
-
-    }
-
-    // PASS 2 - Present elsewhere
-
-    for (let i = 0; i < COLS; i++) {
-
-        if (guess[i] === null) continue;
-
-        const index = answer.indexOf(guess[i]);
-
-        if (index !== -1) {
-
-            state[i] = "present";
-
-            answer[index] = null;
-
-        }
-
-    }
-
-    // Apply Colors
-
-    for (let i = 0; i < COLS; i++) {
-
-        const tile = getTile(currentRow, i);
-
-        tile.classList.add("flip");
-
-        setTimeout(() => {
-
-            tile.classList.add(state[i]);
-
-        }, i * 200);
-
-    }
-
-    // Check Win
-
-    if (state.every(c => c === "correct")) {
-
-        setTimeout(playerWon, 1200);
-
-        return;
-
-    }
-
-    currentRow++;
-
-    updateAttempts();
-
-    currentGuess = "";
-
-    if (currentRow >= MAX_ATTEMPTS) {
-
-        setTimeout(playerLost, 1200);
-
-        return;
-
-    }
-
-}
-
-// -------------------------------
-// Random Access Code
-// -------------------------------
-
-function generateAccessCode() {
-
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    let code = "";
-
-    for (let i = 0; i < 6; i++) {
-
-        code += chars[Math.floor(Math.random() * chars.length)];
-
-    }
-
-    return code;
-
-}
-
-// -------------------------------
-// Player Won
-// -------------------------------
-
-function playerWon() {
-
-    gameOver = true;
-
-    clearInterval(hackFeedTimer);
-
-    statusLabel.textContent = "ACCESS GRANTED";
-
-    message.textContent =
-        "Generating Security Token...";
-
-    const code = generateAccessCode();
-
-    localStorage.setItem("accessCode", code);
-
-    document.getElementById("generatedCode")
-        .textContent = code;
-
-    document
-        .getElementById("winOverlay")
-        .classList.remove("hidden");
-
-}
-
-// -------------------------------
-// Player Lost
-// -------------------------------
-
-function playerLost() {
-
-    gameOver = true;
-
-    clearInterval(hackFeedTimer);
-
-    statusLabel.textContent = "ACCESS DENIED";
-
-    message.textContent =
-        "Firewall blocked the intrusion.";
-
-    document
-        .getElementById("loseOverlay")
-        .classList.remove("hidden");
-
-}
-
-// -------------------------------
-// Continue
-// -------------------------------
-
-const continueBtn =
-document.getElementById("continueBtn");
-
-if (continueBtn) {
-
-    continueBtn.addEventListener("click", () => {
-
-        window.location = "verify.html";
-
-    });
-
-}
-
-// -------------------------------
-// Restart
-// -------------------------------
-
-const restartBtn =
-document.getElementById("restartBtn");
-
-if (restartBtn) {
-
-    restartBtn.addEventListener("click", () => {
-
-        localStorage.removeItem("accessCode");
-
-        location.reload();
-
-    });
-
-}}
-/*==================================================
-PART 3B-1
-VERIFY PAGE LOGIC
-==================================================*/
-if (document.getElementById("codeInput")) {
-
-// Only run this code on verify.html
-if (window.location.pathname.includes("verify.html")) {
-
-    const codeInput = document.getElementById("codeInput");
-    const verifyBtn = document.getElementById("verifyBtn");
-    const verifyMessage = document.getElementById("verifyMessage");
-
-    const loadingOverlay =
-        document.getElementById("loadingOverlay");
-
-    const errorOverlay =
-        document.getElementById("errorOverlay");
-
-    const tryAgainBtn =
-        document.getElementById("tryAgainBtn");
-
-    // Read stored access code
-    const storedCode =
-        localStorage.getItem("accessCode");
-
-    // If no code exists, return to game
-    if (!storedCode) {
-
-        verifyMessage.textContent =
-            "No security token found.";
-
-        setTimeout(() => {
-
-            window.location.href = "numberdle.html";
-
-        }, 2000);
-
-    }
-
-    // Verify button
-    verifyBtn.addEventListener("click", verifyCode);
-
-    // Allow Enter key
-    codeInput.addEventListener("keydown", (e) => {
-
-        if (e.key === "Enter") {
-
-            verifyCode();
-
-        }
-
-    });
-
-    // Close error popup
-    tryAgainBtn.addEventListener("click", () => {
-
-        errorOverlay.classList.add("hidden");
-
-        codeInput.value = "";
-
-        codeInput.focus();
-
-    });
-
-    function verifyCode() {
-
-        const entered =
-            codeInput.value.trim().toUpperCase();
-
-        if (entered.length !== 6) {
-
-            verifyMessage.textContent =
-                "Security token must contain 6 characters.";
-
-            return;
-
-        }
-
-        if (entered === storedCode) {
-
-            verifyMessage.textContent =
-                "Token accepted.";
-
-            loadingOverlay.classList.remove("hidden");
-
-            startDecryptSequence();
-
-        }
-        else {
-
-            verifyMessage.textContent =
-                "Invalid security token.";
-
-            errorOverlay.classList.remove("hidden");
-
-        }
-
-    }
-
-}/*==================================================
-PART 3B-2
-Decrypt Animation + Redirect
-==================================================*/
-
-function startDecryptSequence() {
-
-    const loadingText =
-        document.getElementById("loadingText");
-
-    const steps = [
-
-        "Decrypting security token...",
-        "Bypassing firewall...",
-        "Establishing secure tunnel...",
-        "Escalating privileges...",
-        "Accessing mainframe...",
-        "Disabling intrusion detection...",
-        "Authenticating...",
-        "Access Granted."
-
+(() => {
+    "use strict";
+
+    const PAGE = {
+        landing: "index.html",
+        terminal: "numberdle.html",
+        verify: "verify.html",
+        success: "success.html"
+    };
+
+    const SECURITY_LOGS = [
+        "Scanning active ports...",
+        "Establishing encrypted tunnel...",
+        "Intercepting authentication packets...",
+        "Synchronizing exploit payload...",
+        "Decrypting key fragments...",
+        "Injecting verification sequence...",
+        "Analyzing response signature...",
+        "Bypassing firewall layer...",
+        "Monitoring intrusion detection...",
+        "Extracting authentication hash...",
+        "Negotiating secure channel...",
+        "Verifying encryption checksum...",
+        "Collecting system entropy...",
+        "Generating temporary session...",
+        "Access token initialized..."
     ];
 
-    let index = 0;
+    const MATRIX_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&@{}[]";
 
-    loadingText.textContent = steps[0];
+    const $ = (id) => document.getElementById(id);
 
-    const timer = setInterval(() => {
+    const isCurrentPage = (fileName) => window.location.pathname.endsWith(fileName);
 
-        index++;
+    const randomItem = (values) => values[Math.floor(Math.random() * values.length)];
 
-        if (index >= steps.length) {
-
-            clearInterval(timer);
-
-            localStorage.setItem(
-                "verified",
-                "true"
-            );
-
-            setTimeout(() => {
-
-                window.location.href =
-                    "success.html";
-
-            }, 700);
-
+    function typeLines(target, lines, speed = 30, pause = 250, onComplete) {
+        if (!target) {
             return;
-
         }
 
-        loadingText.textContent =
-            steps[index];
+        let lineIndex = 0;
 
-    }, 1000);
-
-}
-
-/*==========================================
-Optional Matrix Animation
-==========================================*/
-
-(function(){
-
-    const canvas = document.getElementById("matrix");
-
-    if(!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-
-    function resize(){
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-    }
-
-    resize();
-
-    window.addEventListener("resize",resize);
-
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
-
-    const size = 18;
-
-    const cols = () =>
-        Math.floor(canvas.width/size);
-
-    let drops = [];
-
-    function resetDrops(){
-
-        drops = [];
-
-        for(let i=0;i<cols();i++)
-            drops[i]=1;
-
-    }
-
-    resetDrops();
-
-    function draw(){
-
-        ctx.fillStyle="rgba(0,0,0,.07)";
-        ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        ctx.fillStyle="#00ff66";
-        ctx.font=size+"px monospace";
-
-        for(let i=0;i<drops.length;i++){
-
-            const ch =
-                chars[
-                    Math.floor(
-                        Math.random()*chars.length
-                    )
-                ];
-
-            ctx.fillText(
-                ch,
-                i*size,
-                drops[i]*size
-            );
-
-            if(
-                drops[i]*size >
-                canvas.height &&
-                Math.random()>.975
-            ){
-
-                drops[i]=0;
-
+        const typeNextLine = () => {
+            if (lineIndex >= lines.length) {
+                if (typeof onComplete === "function") {
+                    onComplete();
+                }
+                return;
             }
 
-            drops[i]++;
+            const line = lines[lineIndex];
+            const row = document.createElement("p");
+            target.appendChild(row);
 
+            let charIndex = 0;
+            const timer = window.setInterval(() => {
+                row.textContent = line.slice(0, charIndex);
+                charIndex++;
+
+                if (charIndex > line.length) {
+                    window.clearInterval(timer);
+                    lineIndex++;
+                    window.setTimeout(typeNextLine, pause);
+                }
+            }, speed);
+        };
+
+        typeNextLine();
+    }
+
+    function startMatrixRain() {
+        const canvas = $("matrix");
+        if (!canvas) {
+            return;
         }
 
-    }
+        const context = canvas.getContext("2d");
+        if (!context) {
+            return;
+        }
 
-    setInterval(draw,40);
+        const fontSize = 18;
+        let drops = [];
+        let rainTimer = null;
 
-})();}
-/*==================================================
-PART 4B-1
-SUCCESS PAGE LOGIC
-==================================================*/
-if (document.getElementById("terminalOutput")) {
+        const resize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const columns = Math.max(1, Math.floor(canvas.width / fontSize));
+            drops = Array(columns).fill(1);
+        };
 
-if (window.location.pathname.includes("success.html")) {
+        const draw = () => {
+            context.fillStyle = "rgba(0,0,0,0.08)";
+            context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // -----------------------------------
-    // Security Check
-    // -----------------------------------
+            context.font = `${fontSize}px monospace`;
+            context.fillStyle = "#00ff66";
 
-    if (localStorage.getItem("verified") !== "true") {
+            for (let i = 0; i < drops.length; i++) {
+                const char = MATRIX_CHARSET[Math.floor(Math.random() * MATRIX_CHARSET.length)];
+                context.fillText(char, i * fontSize, drops[i] * fontSize);
 
-        window.location.href = "index.html";
-
-    }
-
-    const terminal =
-        document.getElementById("terminalOutput");
-
-    const successPanel =
-        document.getElementById("successPanel");
-
-    const overlay =
-        document.getElementById("celebrationOverlay");
-
-    // -----------------------------------
-    // Fake Hacking Sequence
-    // -----------------------------------
-
-    const lines = [
-
-        "[ OK ] Connection established",
-        "[ OK ] Firewall bypassed",
-        "[ OK ] Injecting payload",
-        "[ OK ] Escalating privileges",
-        "[ OK ] Reading encrypted data",
-        "[ OK ] Decrypting...",
-        "[ OK ] Root access granted",
-        "[ OK ] Mission completed"
-
-    ];
-
-    let currentLine = 0;
-
-    function typeLine(text, callback) {
-
-        const p = document.createElement("p");
-
-        terminal.appendChild(p);
-
-        let i = 0;
-
-        const timer = setInterval(() => {
-
-            p.textContent = text.substring(0, i);
-
-            i++;
-
-            if (i > text.length) {
-
-                clearInterval(timer);
-
-                if (callback) {
-
-                    setTimeout(callback, 350);
-
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
                 }
 
+                drops[i] += 1;
             }
+        };
 
-        }, 35);
-
+        resize();
+        rainTimer = window.setInterval(draw, 40);
+        window.addEventListener("resize", resize);
+        window.addEventListener("beforeunload", () => {
+            if (rainTimer) {
+                window.clearInterval(rainTimer);
+            }
+        });
     }
 
-    function nextLine() {
-
-        if (currentLine >= lines.length) {
-
-            finishMission();
-
+    function initLandingPage() {
+        if (!isCurrentPage(PAGE.landing)) {
             return;
-
         }
 
-        typeLine(lines[currentLine], () => {
+        const bootScreen = $("bootScreen");
+        const mainScreen = $("mainScreen");
+        const terminalText = $("terminalText");
+        const startBtn = $("startBtn");
 
-            currentLine++;
+        if (!bootScreen || !mainScreen || !terminalText || !startBtn) {
+            return;
+        }
 
+        const introLines = [
+            "SECURITY INCIDENT DETECTED",
+            "Encrypted authentication token isolated.",
+            "Standard access channels disabled.",
+            "Cryptographic verification required.",
+            "Authorization status: RESTRICTED"
+        ];
+
+        window.setTimeout(() => {
+            bootScreen.classList.add("hidden");
+            mainScreen.classList.remove("hidden");
+            typeLines(terminalText, introLines, 25, 220);
+        }, 4800);
+
+        startBtn.addEventListener("click", () => {
+            window.location.href = PAGE.terminal;
+        });
+    }
+
+    function initNumberdlePage() {
+        if (!isCurrentPage(PAGE.terminal)) {
+            return;
+        }
+
+        const board = $("board");
+        const messageLabel = $("message");
+        const attemptsLabel = $("attempts");
+        const statusLabel = $("statusText");
+        const attemptBuffer = $("attemptBuffer");
+        const hackFeed = $("hackFeed");
+        const generatedCode = $("generatedCode");
+        const winOverlay = $("winOverlay");
+        const loseOverlay = $("loseOverlay");
+        const continueBtn = $("continueBtn");
+        const restartBtn = $("restartBtn");
+        const keyboardButtons = Array.from(document.querySelectorAll(".key"));
+
+        if (!board || !messageLabel || !attemptsLabel || !statusLabel || !attemptBuffer || !hackFeed || !generatedCode || !winOverlay || !loseOverlay || !continueBtn || !restartBtn || keyboardButtons.length === 0) {
+            return;
+        }
+
+        const ROWS = 6;
+        const COLS = 5;
+        const MAX_ATTEMPTS = 6;
+        let secretNumber = "";
+        let currentGuess = "";
+        let currentRow = 0;
+        let sessionLocked = false;
+        let feedTimer = null;
+
+        const getTile = (row, col) => document.querySelector(`.tile[data-row="${row}"][data-col="${col}"]`);
+
+        const setSystemLog = (text) => {
+            messageLabel.textContent = text;
+        };
+
+        const setHackFeed = (text) => {
+            const line = hackFeed.querySelector("p");
+            if (line) {
+                line.textContent = text;
+            } else {
+                hackFeed.textContent = text;
+            }
+        };
+
+        const generateUniqueSecret = () => {
+            const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+            for (let i = digits.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [digits[i], digits[j]] = [digits[j], digits[i]];
+            }
+            return digits.slice(0, COLS).join("");
+        };
+
+        const updateAttempts = () => {
+            attemptsLabel.textContent = String(MAX_ATTEMPTS - currentRow);
+        };
+
+        const drawGuess = () => {
+            for (let col = 0; col < COLS; col++) {
+                const tile = getTile(currentRow, col);
+                if (tile) {
+                    tile.textContent = currentGuess[col] || "";
+                }
+            }
+            const maskedAttempt = `${currentGuess}${"-".repeat(COLS - currentGuess.length)}`;
+            attemptBuffer.textContent = maskedAttempt;
+        };
+
+        const shakeCurrentRow = () => {
+            for (let col = 0; col < COLS; col++) {
+                const tile = getTile(currentRow, col);
+                if (!tile) {
+                    continue;
+                }
+                tile.classList.add("shake");
+                window.setTimeout(() => tile.classList.remove("shake"), 350);
+            }
+        };
+
+        const isUniqueAttempt = (guess) => new Set(guess.split("")).size === COLS;
+
+        const evaluateGuess = () => {
+            const answer = secretNumber.split("");
+            const guess = currentGuess.split("");
+            const state = new Array(COLS).fill("absent");
+
+            for (let i = 0; i < COLS; i++) {
+                if (guess[i] === answer[i]) {
+                    state[i] = "correct";
+                    answer[i] = null;
+                    guess[i] = null;
+                }
+            }
+
+            for (let i = 0; i < COLS; i++) {
+                if (!guess[i]) {
+                    continue;
+                }
+                const matchIndex = answer.indexOf(guess[i]);
+                if (matchIndex !== -1) {
+                    state[i] = "present";
+                    answer[matchIndex] = null;
+                }
+            }
+
+            for (let i = 0; i < COLS; i++) {
+                const tile = getTile(currentRow, i);
+                if (!tile) {
+                    continue;
+                }
+                tile.classList.add("flip");
+                window.setTimeout(() => tile.classList.add(state[i]), i * 180);
+            }
+
+            if (state.every((code) => code === "correct")) {
+                window.setTimeout(handleAccessGranted, 950);
+                return;
+            }
+
+            currentRow++;
+            currentGuess = "";
+            updateAttempts();
+            drawGuess();
+
+            if (currentRow >= ROWS) {
+                window.setTimeout(handleFirewallLockdown, 950);
+                return;
+            }
+
+            statusLabel.textContent = "Authentication In Progress";
+            setSystemLog(randomItem(SECURITY_LOGS));
+        };
+
+        const generateAccessCode = () => {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let code = "";
+            for (let i = 0; i < 6; i++) {
+                code += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return code;
+        };
+
+        const handleAccessGranted = () => {
+            sessionLocked = true;
+            if (feedTimer) {
+                window.clearInterval(feedTimer);
+            }
+            statusLabel.textContent = "Access Granted";
+            setSystemLog("Temporary security token generated successfully.");
+
+            const token = generateAccessCode();
+            localStorage.setItem("accessCode", token);
+            generatedCode.textContent = token;
+            winOverlay.classList.remove("hidden");
+        };
+
+        const handleFirewallLockdown = () => {
+            sessionLocked = true;
+            if (feedTimer) {
+                window.clearInterval(feedTimer);
+            }
+            statusLabel.textContent = "Access Denied";
+            setSystemLog("Firewall response triggered. Mission failed.");
+            loseOverlay.classList.remove("hidden");
+        };
+
+        const submitGuess = () => {
+            if (currentGuess.length !== COLS) {
+                setSystemLog("Authentication attempt requires exactly five digits.");
+                shakeCurrentRow();
+                return;
+            }
+
+            if (!isUniqueAttempt(currentGuess)) {
+                setSystemLog("Security protocol violation: repeated digits are not permitted.");
+                shakeCurrentRow();
+                return;
+            }
+
+            evaluateGuess();
+        };
+
+        const handleInput = (key) => {
+            if (sessionLocked) {
+                return;
+            }
+
+            if (/^[0-9]$/.test(key)) {
+                if (currentGuess.length < COLS) {
+                    currentGuess += key;
+                    drawGuess();
+                    statusLabel.textContent = "Buffering Authentication Attempt";
+                }
+                return;
+            }
+
+            if (key === "Backspace") {
+                currentGuess = currentGuess.slice(0, -1);
+                drawGuess();
+                return;
+            }
+
+            if (key === "Enter") {
+                submitGuess();
+            }
+        };
+
+        const handlePhysicalInput = (event) => {
+            if (/^[0-9]$/.test(event.key) || event.key === "Backspace" || event.key === "Enter") {
+                event.preventDefault();
+                handleInput(event.key);
+            }
+        };
+
+        const startSecurityFeed = () => {
+            const nextLine = () => {
+                const line = randomItem(SECURITY_LOGS);
+                setHackFeed(line);
+                if (!sessionLocked) {
+                    setSystemLog(line);
+                }
+            };
             nextLine();
+            feedTimer = window.setInterval(nextLine, 2800);
+        };
 
+        secretNumber = generateUniqueSecret();
+        currentGuess = "";
+        currentRow = 0;
+        sessionLocked = false;
+
+        updateAttempts();
+        statusLabel.textContent = "Authentication Idle";
+        setSystemLog("Awaiting authentication attempt...");
+        attemptBuffer.textContent = "-----";
+        startSecurityFeed();
+
+        document.addEventListener("keydown", handlePhysicalInput);
+        keyboardButtons.forEach((button) => {
+            const key = button.dataset.key;
+            if (!key) {
+                return;
+            }
+            button.addEventListener("click", () => handleInput(key));
         });
 
+        continueBtn.addEventListener("click", () => {
+            window.location.href = PAGE.verify;
+        });
+
+        restartBtn.addEventListener("click", () => {
+            localStorage.removeItem("accessCode");
+            localStorage.removeItem("verified");
+            window.location.reload();
+        });
     }
 
-    // -----------------------------------
-    // Final Reveal
-    // -----------------------------------
+    function initVerifyPage() {
+        if (!isCurrentPage(PAGE.verify)) {
+            return;
+        }
 
-    function finishMission() {
+        const codeInput = $("codeInput");
+        const verifyBtn = $("verifyBtn");
+        const verifyMessage = $("verifyMessage");
+        const loadingOverlay = $("loadingOverlay");
+        const loadingText = $("loadingText");
+        const errorOverlay = $("errorOverlay");
+        const tryAgainBtn = $("tryAgainBtn");
 
-        setTimeout(() => {
+        if (!codeInput || !verifyBtn || !verifyMessage || !loadingOverlay || !loadingText || !errorOverlay || !tryAgainBtn) {
+            return;
+        }
 
+        const storedCode = localStorage.getItem("accessCode");
+        if (!storedCode) {
+            verifyMessage.textContent = "No temporary token found. Redirecting to authentication terminal...";
+            window.setTimeout(() => {
+                window.location.href = PAGE.terminal;
+            }, 1800);
+            return;
+        }
+
+        const decryptSteps = [
+            "Initializing secure session...",
+            "Authenticating token...",
+            "Decrypting protected partitions...",
+            "Bypassing firewall...",
+            "Escalating privileges...",
+            "Accessing secure filesystem...",
+            "Extracting encrypted records...",
+            "Verification complete.",
+            "Root session established."
+        ];
+
+        const runDecryptionProtocol = () => {
+            loadingOverlay.classList.remove("hidden");
+            let stepIndex = 0;
+            loadingText.textContent = decryptSteps[stepIndex];
+
+            const timer = window.setInterval(() => {
+                stepIndex++;
+                if (stepIndex >= decryptSteps.length) {
+                    window.clearInterval(timer);
+                    localStorage.setItem("verified", "true");
+                    window.setTimeout(() => {
+                        window.location.href = PAGE.success;
+                    }, 700);
+                    return;
+                }
+                loadingText.textContent = decryptSteps[stepIndex];
+            }, 900);
+        };
+
+        const verifyToken = () => {
+            const enteredToken = codeInput.value.trim().toUpperCase();
+
+            if (enteredToken.length !== 6) {
+                verifyMessage.textContent = "Token format invalid. Six alphanumeric characters required.";
+                return;
+            }
+
+            if (enteredToken === storedCode) {
+                verifyMessage.textContent = "TOKEN VERIFIED";
+                runDecryptionProtocol();
+                return;
+            }
+
+            verifyMessage.textContent = "TOKEN REJECTED";
+            errorOverlay.classList.remove("hidden");
+        };
+
+        verifyBtn.addEventListener("click", verifyToken);
+        codeInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                verifyToken();
+            }
+        });
+
+        tryAgainBtn.addEventListener("click", () => {
+            errorOverlay.classList.add("hidden");
+            codeInput.value = "";
+            codeInput.focus();
+        });
+    }
+
+    function initSuccessPage() {
+        if (!isCurrentPage(PAGE.success)) {
+            return;
+        }
+
+        if (localStorage.getItem("verified") !== "true") {
+            window.location.href = PAGE.landing;
+            return;
+        }
+
+        const terminalOutput = $("terminalOutput");
+        const successPanel = $("successPanel");
+        const celebrationOverlay = $("celebrationOverlay");
+        const restartMission = $("restartMission");
+        const confettiContainer = $("confettiContainer");
+
+        if (!terminalOutput || !successPanel || !celebrationOverlay || !restartMission || !confettiContainer) {
+            return;
+        }
+
+        const sequence = [
+            "Initializing secure session...",
+            "Authenticating token...",
+            "Decrypting protected partitions...",
+            "Bypassing firewall...",
+            "Escalating privileges...",
+            "Accessing secure filesystem...",
+            "Extracting encrypted records...",
+            "Verification complete.",
+            "Root session established."
+        ];
+
+        const launchConfetti = () => {
+            const colors = ["#00ff66", "#4dff9a", "#a8ffcc", "#f7fff9"];
+            for (let i = 0; i < 45; i++) {
+                const piece = document.createElement("span");
+                piece.className = "confetti-piece";
+                piece.style.left = `${Math.random() * 100}%`;
+                piece.style.backgroundColor = randomItem(colors);
+                piece.style.animationDuration = `${2.2 + Math.random() * 2.2}s`;
+                piece.style.opacity = `${0.6 + Math.random() * 0.4}`;
+                confettiContainer.appendChild(piece);
+                window.setTimeout(() => piece.remove(), 5000);
+            }
+        };
+
+        const finishSequence = () => {
             successPanel.classList.remove("hidden");
+            celebrationOverlay.classList.remove("hidden");
+            launchConfetti();
 
-            overlay.classList.remove("hidden");
+            window.setTimeout(() => {
+                celebrationOverlay.classList.add("hidden");
+            }, 2100);
+        };
 
-            setTimeout(() => {
+        typeLines(terminalOutput, sequence, 28, 300, () => {
+            window.setTimeout(finishSequence, 450);
+        });
 
-                overlay.classList.add("hidden");
-
-            }, 2200);
-
-        }, 800);
-
+        restartMission.addEventListener("click", () => {
+            localStorage.removeItem("accessCode");
+            localStorage.removeItem("verified");
+            window.location.href = PAGE.landing;
+        });
     }
 
-    // Start animation
-
-    nextLine();
-
-}}
+    startMatrixRain();
+    initLandingPage();
+    initNumberdlePage();
+    initVerifyPage();
+    initSuccessPage();
+})();
