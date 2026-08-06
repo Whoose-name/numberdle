@@ -30,7 +30,19 @@
 
     const $ = (id) => document.getElementById(id);
 
-    const isCurrentPage = (fileName) => window.location.pathname.endsWith(fileName);
+    const resolveCurrentPage = () => {
+        const path = window.location.pathname.split("?")[0].split("#")[0];
+        const segments = path.split("/").filter(Boolean);
+        const tail = segments.length > 0 ? segments[segments.length - 1] : "";
+
+        if (!tail || !tail.includes(".")) {
+            return PAGE.landing;
+        }
+
+        return tail.toLowerCase();
+    };
+
+    const isCurrentPage = (fileName) => resolveCurrentPage() === fileName.toLowerCase();
 
     const randomItem = (values) => values[Math.floor(Math.random() * values.length)];
 
