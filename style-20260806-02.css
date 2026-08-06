@@ -726,3 +726,12 @@ button:active,
         letter-spacing: 3px;
     }
 }
+.encrypted-image{
+    display:block;
+    width:100%;
+    max-width:650px;
+    margin:20px auto;
+    border:2px solid #00ff66;
+    border-radius:8px;
+    box-shadow:0 0 25px rgba(0,255,100,.4);
+}
